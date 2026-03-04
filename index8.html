@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Snowy Icons</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#e6f0ff;background:linear-gradient(180deg,#031028 0%, #061431 60%);overflow:hidden}
+    .fade{opacity:0;transition:opacity 0.8s ease}
+    .fade.active{opacity:1}
+
+    .centered{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;text-align:center;padding:24px;position:relative;}
+    h1{font-size:28px;margin-bottom:16px;text-shadow:0 0 6px #bfe8ff;}
+    h2.title{font-size:32px;margin-bottom:20px;font-weight:700;letter-spacing:-0.5px;background: linear-gradient(90deg,#bfe8ff,#7fc8ff);-webkit-background-clip: text;color:transparent;animation: shimmer 3s ease-in-out infinite;}
+
+    @keyframes shimmer{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+
+    input[type=text]{padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#fff;font-size:16px;width:260px;text-align:center;}
+    button{margin-top:14px;padding:10px 18px;border-radius:8px;border:0;background:#9ad4ff;color:#00233a;font-weight:600;cursor:pointer;font-size:15px;}
+
+    .card{width:980px;max-width:100%;background:rgba(255,255,255,0.03);border-radius:14px;padding:20px;box-shadow:0 8px 30px rgba(2,6,23,0.7);margin:auto;position:relative;overflow:hidden}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:18px;justify-content:space-between;flex-wrap:wrap}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo .icon{width:56px;height:56px;background:linear-gradient(180deg,#bfe8ff,#7fc8ff);border-radius:10px;display:grid;place-items:center;color:#012;box-shadow:0 6px 18px rgba(127,200,255,0.12)}
+    .logo h2{margin:0;font-size:20px;letter-spacing:-0.3px}
+    .sub{color:#9fb7d9;font-size:13px}
+
+    #forecastArea {
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .forecast{display:flex;flex-direction:column;gap:12px;padding-bottom:12px;}
+    .day{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;}
+    .date{font-size:13px;color:#cfe8ff;margin-bottom:6px;}
+    .snowBox{font-weight:700;font-size:22px;background:rgba(255,255,255,0.1);padding:10px 22px;border-radius:14px;display:inline-block;margin:6px 0;color:#fff;}
+    .tempSmall{font-size:14px;color:#9fb7d9;margin-top:4px;}
+    .desc{font-size:16px;color:#9fb7d9;font-weight:500;margin-top:4px;} 
+    .footer{margin-top:14px;color:#9fb7d9;font-size:13px;text-align:center}
+
+    .snowflake{position:absolute;top:-10px;left:0;right:0;height:100%;pointer-events:none;overflow:hidden;z-index:0}
+    .snowflake i{position:absolute;top:-10px;color:rgba(255,255,255,0.9);font-size:12px;animation:fall linear infinite;opacity:0.9}
+    @keyframes fall{0%{transform:translateY(-10vh) rotate(0);}100%{transform:translateY(120vh) rotate(360deg);}}
+
+    @keyframes fallHome{0%{transform:translateY(-10vh) rotate(0);}100%{transform:translateY(120vh) rotate(360deg);}}
+
+    .backBtn{background:none;border:1px solid rgba(255,255,255,0.3);color:#9ad4ff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;}
+  </style>
+</head>
+<body>
+  <div id="home" class="centered fade active">
+    <h2 class="title">SnowyIcons.com</h2>
+    <h1>Where do you want to see snow?</h1>
+    <input id="homeInput" placeholder="" />
+    <button id="homeGo">Go</button>
+    <div class="snowflake" id="homeSnow"></div>
+  </div>
+
+  <div id="forecastPage" class="wrap fade" style="display:none;">
+    <div class="card">
+      <div class="snowflake" id="snowlayer"></div>
+      <header>
+        <div class="logo">
+          <div class="icon">🌨️</div>
+          <div>
+            <h2 id="locTitle">Showing weather for...</h2>
+            <div class="sub">14-Day Snow Forecast</div>
+          </div>
+        </div>
+        <button class="backBtn" id="backBtn">Change location</button>
+      </header>
+      <section id="forecastArea">
+        <div class="forecast" id="forecastGrid"></div>
+        <div class="footer" id="footerText"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Snow generator
+    function spawnHomeSnow(count){
+      const layer=document.getElementById('homeSnow');
+      layer.innerHTML='';
+      for(let i=0;i<count;i++){
+        const el=document.createElement('i');
+        const size=6+Math.floor(Math.random()*12);
+        el.style.left=Math.floor(Math.random()*100)+'%';
+        el.style.fontSize=size+'px';
+        el.style.animationDuration=(5+Math.random()*6)+'s';
+        el.style.animationDelay=(Math.random()*-10)+'s';
+        el.textContent='❄';
+        layer.appendChild(el);
+      }
+    }
+    spawnHomeSnow(20);
+
+    function xmur3(str){for(var i=0,h=1779033703^str.length;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19;}return function(){h=Math.imul(h^(h>>>16),2246822507);h=Math.imul(h^(h>>>13),3266489909);return(h^=h>>>16)>>>0;}}
+    function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;}}
+
+    const descOptions=[
+      'Pow day incoming!','Endless blower snow','Whiteout conditions — bring goggles','Perfect for backflips','Tree runs all day','Avalanche warning: too much fun','Send it Sunday snowstorm','Knee-deep fluff','Time to wax those skis','Face shots guaranteed','Park buried under powder','Snowpocalypse continues','Too deep to drive — ski instead','Fresh lines everywhere','Snowmageddon encore','Infinite laps at the hill','Chairlift buried again','Bring a snorkel','Overhead powder','More snow than physics allows'
+    ];
+
+    function makeForecast(seedStr){
+      const seed=xmur3(seedStr)();
+      const rnd=mulberry32(seed);
+      const data=[];
+      for(let i=0;i<14;i++){
+        const high=Math.round(-20+Math.floor(rnd()*13));
+        const low=high-Math.floor(rnd()*4);
+        const snow=(7+Math.floor(rnd()*24)).toFixed(0);
+        const desc=descOptions[Math.floor(rnd()*descOptions.length)];
+        data.push({high,low,snow,desc});
+      }
+      return data;
+    }
+
+    function dayLabel(offset){
+      const d=new Date();
+      d.setDate(d.getDate()+offset);
+      return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+    }
+
+    function renderForecast(location){
+      const grid=document.getElementById('forecastGrid');
+      grid.innerHTML='';
+      const forecast=makeForecast(location.toLowerCase().trim()||'always snow');
+      for(let i=0;i<14;i++){
+        const f=forecast[i];
+        const tile=document.createElement('div');
+        tile.className='day';
+        tile.innerHTML=`
+          <div class="date">${dayLabel(i)}</div>
+          <div style="font-size:28px;margin-top:6px">🌨️</div>
+          <div class="snowBox">${f.snow} cm</div>
+          <div class="tempSmall">${f.high}°C / ${f.low}°C</div>
+          <div class="desc">${f.desc}</div>
+        `;
+        grid.appendChild(tile);
+      }
+      document.getElementById('locTitle').textContent=`Showing weather for ${location}`;
+      document.getElementById('footerText').textContent=`14-Day snow forecast for ${location} — nonstop snow guaranteed.`;
+      spawnForecastSnow(20);
+    }
+
+    function spawnForecastSnow(count){
+      const layer=document.getElementById('snowlayer');
+      layer.innerHTML='';
+      for(let i=0;i<count;i++){
+        const el=document.createElement('i');
+        const size=8+Math.floor(Math.random()*18);
+        el.style.left=Math.floor(Math.random()*100)+'%';
+        el.style.fontSize=size+'px';
+        el.style.opacity=(0.6+Math.random()*0.4).toFixed(2);
+        el.style.animationDuration=(6+Math.random()*8)+'s';
+        el.style.animationDelay=(Math.random()*-10)+'s';
+        el.textContent='❄';
+        layer.appendChild(el);
+      }
+    }
+
+    document.getElementById('homeGo').addEventListener('click',()=>{
+      const loc=document.getElementById('homeInput').value||'British Columbia';
+      const home=document.getElementById('home');
+      const page=document.getElementById('forecastPage');
+      home.classList.remove('active');
+      setTimeout(()=>{
+        home.style.display='none';
+        page.style.display='block';
+        setTimeout(()=>{page.classList.add('active');},100);
+        renderForecast(loc);
+      },600);
+    });
+
+    document.getElementById('backBtn').addEventListener('click',()=>{
+      const home=document.getElementById('home');
+      const page=document.getElementById('forecastPage');
+      page.classList.remove('active');
+      setTimeout(()=>{
+        page.style.display='none';
+        home.style.display='flex';
+        setTimeout(()=>{home.classList.add('active');},100);
+      },600);
+    });
+
+    document.getElementById('homeInput').addEventListener('keypress',e=>{
+      if(e.key==='Enter')document.getElementById('homeGo').click();
+    });
+  </script>
+</body>
+</html>
